@@ -2,10 +2,13 @@
 # Script to dispatch NetworkManager events
 
 # Configuration
-CONFIG_DEBUG=false
-CONFIG_VPN_TABLE=220
-CONFIG_VPN_CONNECTION_ID=VpnAlmg
-CONFIG_VPN_NETWORK=172.16.0.0/12
+export CONFIG_DEBUG=false
+export CONFIG_VPN_TABLE=220
+export CONFIG_VPN_CONNECTION_ID=VpnAlmg
+export CONFIG_VPN_NETWORK=172.16.0.0/12
+
+export ACTION=$NM_DISPATCHER_ACTION
+test -z "$ACTION" && export ACTION=$2
 
 if $CONFIG_DEBUG; then
   exec >> /tmp/splitvpn-debug.txt 2>&1
@@ -17,9 +20,8 @@ if $CONFIG_DEBUG; then
   ip route show table all
 fi
 
-
 # Skip on other actions
-test "$NM_DISPATCHER_ACTION" = "vpn-up" || exit 0
+test "$ACTION" = "vpn-up" || exit 0
 
 # Skip on other connections
 test "$CONNECTION_ID" = "$CONFIG_VPN_CONNECTION_ID" || exit 0
