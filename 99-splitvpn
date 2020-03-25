@@ -1,0 +1,36 @@
+#!/bin/sh -e
+# Script to dispatch NetworkManager events
+
+# Configuration
+CONFIG_DEBUG=false
+CONFIG_VPN_TABLE=220
+CONFIG_VPN_CONNECTION_ID=VpnAlmg
+CONFIG_VPN_NETWORK=172.16.0.0/12
+
+if $CONFIG_DEBUG; then
+  exec >> /tmp/splitvpn-debug.txt 2>&1
+
+  echo '## ENVIRONMENT'
+  env
+
+  echo '## ROUTES BEFORE'
+  ip route show table all
+fi
+
+
+# Skip on other actions
+test "$NM_DISPATCHER_ACTION" = "vpn-up" || exit 0
+
+# Skip on other connections
+test "$CONNECTION_ID" = "$CONFIG_VPN_CONNECTION_ID" || exit 0
+
+# Repopulate the table
+ip route flush table $CONFIG_VPN_TABLE
+ip route add default via $IP4_GATEWAY dev $DEVICE_IFACE proto static table $CONFIG_VPN_TABLE
+ip route add $CONFIG_VPN_NETWORK dev $DEVICE_IFACE proto static src ${IP4_ADDRESS_1%/*} table $CONFIG_VPN_TABLE
+
+if $CONFIG_DEBUG; then
+  echo '## ROUTES AFTER'
+  ip route show table all
+fi
+
