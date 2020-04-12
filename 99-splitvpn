@@ -20,16 +20,25 @@ if $CONFIG_DEBUG; then
   ip route show table all
 fi
 
-# Skip on other actions
-test "$ACTION" = "vpn-up" || exit 0
-
 # Skip on other connections
 test "$CONNECTION_ID" = "$CONFIG_VPN_CONNECTION_ID" || exit 0
 
-# Repopulate the table
-ip route flush table $CONFIG_VPN_TABLE
-ip route add default via $IP4_GATEWAY dev $DEVICE_IFACE proto static table $CONFIG_VPN_TABLE
-ip route add $CONFIG_VPN_NETWORK dev $DEVICE_IFACE proto static src ${IP4_ADDRESS_1%/*} table $CONFIG_VPN_TABLE
+# Skip on other actions
+case $ACTION in
+  (vpn-up)
+    # Repopulate the table
+    ip route flush table $CONFIG_VPN_TABLE
+    ip route add default via $IP4_GATEWAY dev $DEVICE_IFACE proto static table $CONFIG_VPN_TABLE
+    ip route add $CONFIG_VPN_NETWORK dev $DEVICE_IFACE proto static src ${IP4_ADDRESS_1%/*} table $CONFIG_VPN_TABLE
+    ;;
+  (vpn-down)
+    # Kill the table
+    ip route flush table $CONFIG_VPN_TABLE
+    ip route add ${IP4_ROUTE_1%% *} dev $DEVICE_IFACE proto static scope global src ${IP4_ADDRESS_0%/*} table $CONFIG_VPN_TABLE
+    ;;
+  (*)
+    exit 0 ;;
+esac
 
 if $CONFIG_DEBUG; then
   echo '## ROUTES AFTER'
