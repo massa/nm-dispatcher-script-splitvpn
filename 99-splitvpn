@@ -2,6 +2,8 @@
 # Script to dispatch NetworkManager events
 
 # Configuration
+export VERSION=0.6
+
 export CONFIG_DEBUG=false
 export CONFIG_VPN_TABLE=220
 export CONFIG_VPN_CONNECTION_ID=VpnAlmg
