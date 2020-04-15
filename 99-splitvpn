@@ -2,7 +2,7 @@
 # Script to dispatch NetworkManager events
 
 # Configuration
-export VERSION=0.5
+export VERSION=0.6
 
 export CONFIG_DEBUG=false
 export CONFIG_VPN_TABLE=220
