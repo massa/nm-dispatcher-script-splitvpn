@@ -2,7 +2,7 @@
 # Script to dispatch NetworkManager events
 
 # Configuration
-export VERSION=0.6
+export VERSION=0.7
 
 export CONFIG_DEBUG=false
 export CONFIG_VPN_TABLE=220
@@ -30,7 +30,7 @@ case $ACTION in
   (vpn-up)
     # Repopulate the table
     ip route flush table $CONFIG_VPN_TABLE
-    ip route add default via $IP4_GATEWAY dev $DEVICE_IFACE proto static table $CONFIG_VPN_TABLE
+    ip route add default via $IP4_GATEWAY dev $DEVICE_IFACE proto static table $CONFIG_VPN_TABLE src ${IP4_ADDRESS_0%/*}
     ip route add $CONFIG_VPN_NETWORK dev $DEVICE_IFACE proto static src ${IP4_ADDRESS_1%/*} table $CONFIG_VPN_TABLE
     ;;
   (vpn-down)
